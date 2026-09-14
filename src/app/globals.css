@@ -1,0 +1,334 @@
+@import "tailwindcss";
+
+/*
+ * Hushgate — one light look. Flat colour only: no gradients, no glow.
+ * Cobalt is the single accent; ink carries contrast blocks.
+ */
+@theme {
+  --color-paper: #ffffff;
+  --color-mist: #f4f5f9;
+  --color-fog: #e8ebf2;
+  --color-line: #e3e6ee;
+  --color-ink: #151922;
+  --color-ink-2: #20242e;
+  --color-ink-3: #2b303b;
+  --color-slate: #596273;
+  --color-muted: #828c9e;
+  --color-faint: #adb5c3;
+  --color-cobalt: #5267ff;
+  --color-cobalt-deep: #4055d6;
+  --color-cobalt-soft: #e9ecff;
+  --color-mint: #149058;
+  --color-mint-soft: #e3f5ec;
+  --color-coral: #d2453a;
+  --color-amber: #b97800;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter-tight), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+
+  --radius-card: 28px;
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@layer base {
+  html {
+    color: var(--color-ink);
+    background: var(--color-paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    letter-spacing: -0.005em;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-cobalt);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-cobalt);
+    outline-offset: 3px;
+  }
+}
+
+@utility container-page {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 20px;
+
+  @media (width >= 48rem) {
+    padding-inline: 32px;
+  }
+}
+
+/* Header notch: inverse curves join the bar to the top edge of the window. */
+.notch::before,
+.notch::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+.notch::before {
+  left: -22px;
+  background: radial-gradient(circle at 0 100%, transparent 21.5px, #0b0d12 22px);
+}
+.notch::after {
+  right: -22px;
+  background: radial-gradient(circle at 100% 100%, transparent 21.5px, #0b0d12 22px);
+}
+
+/* The same inverse curve, for the dark window inside the hero device frame. */
+.window-notch::before,
+.window-notch::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+}
+.window-notch::before {
+  left: -28px;
+  background: radial-gradient(circle at 0 100%, transparent 27.5px, #0b0d12 28px);
+}
+.window-notch::after {
+  right: -28px;
+  background: radial-gradient(circle at 100% 100%, transparent 27.5px, #0b0d12 28px);
+}
+
+@media (width < 48rem) {
+  .window-notch::before,
+  .window-notch::after {
+    display: none;
+  }
+}
+
+/* Footer: a shallow white tab in the top edge of the black footer, small curves on all four corners. */
+.notch-white::before,
+.notch-white::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+.notch-white::before {
+  left: -14px;
+  background: radial-gradient(circle at 0 100%, transparent 13.5px, #ffffff 14px);
+}
+.notch-white::after {
+  right: -14px;
+  background: radial-gradient(circle at 100% 100%, transparent 13.5px, #ffffff 14px);
+}
+
+/* Call-to-action buttons: bevelled glossy keys in Hushgate blue and black, plus a block-shadow secondary. */
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 180ms var(--ease-out-soft), box-shadow 180ms var(--ease-out-soft), filter 180ms ease, background-color 180ms ease;
+}
+.cta:focus-visible {
+  outline: 2px solid var(--color-cobalt);
+  outline-offset: 3px;
+}
+.cta-arrow {
+  transition: transform 260ms var(--ease-out-soft);
+}
+.cta:hover .cta-arrow {
+  transform: translateX(3px);
+}
+.cta:hover .cta-arrow-return {
+  transform: translate(2px, 2px);
+}
+
+.cta-cobalt,
+.cta-black {
+  color: #ffffff;
+  border-radius: 14px;
+}
+.cta-cobalt:hover,
+.cta-black:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.07);
+}
+.cta-cobalt:active,
+.cta-black:active {
+  transform: translateY(1px);
+  filter: brightness(0.97);
+}
+.cta-cobalt {
+  background: linear-gradient(180deg, #7280ff 0%, #5a67f7 46%, #4b56e8 100%);
+  border: 1px solid #3a43c6;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 -2px 0 rgba(24, 30, 130, 0.22),
+    0 1px 2px rgba(40, 50, 160, 0.35),
+    0 10px 22px -8px rgba(72, 84, 232, 0.6);
+}
+.cta-cobalt:active {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 1px 1px rgba(40, 50, 160, 0.3),
+    0 4px 10px -6px rgba(72, 84, 232, 0.55);
+}
+.cta-black {
+  background: linear-gradient(180deg, #414246 0%, #2c2d31 48%, #1c1d20 100%);
+  border: 1px solid #0b0b0d;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 10px 22px -8px rgba(0, 0, 0, 0.5);
+}
+.cta-black:active {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 1px 1px rgba(0, 0, 0, 0.3),
+    0 4px 10px -6px rgba(0, 0, 0, 0.45);
+}
+/* Secondary: a soft key sitting on a solid black block. */
+.cta-soft {
+  color: #151922;
+  background: #e2e7ff;
+  border: 1.5px solid #0b0d12;
+  border-radius: 10px;
+  box-shadow: -5px 5px 0 0 #0b0d12;
+}
+.cta-soft:hover {
+  transform: translate(1px, -1px);
+  box-shadow: -7px 7px 0 0 #0b0d12;
+}
+.cta-soft:active {
+  transform: translate(-4px, 4px);
+  box-shadow: -1px 1px 0 0 #0b0d12;
+}
+
+/* Future / Now style switch: a black track with a white key. */
+.switch-track {
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  padding: 6px;
+  border-radius: 999px;
+  background: #0b0d12;
+}
+
+/* Smooth scrolling (Lenis). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* City tags orbiting the globe; each tag spins back so its text stays upright. */
+@keyframes orbit {
+  to { transform: rotate(360deg); }
+}
+.orbit {
+  animation: orbit 90s linear infinite;
+}
+.orbit-counter {
+  animation: orbit 90s linear infinite reverse;
+}
+.orbit[data-paused="true"],
+.orbit[data-paused="true"] .orbit-counter {
+  animation-play-state: paused;
+}
+
+/* The globe turns a full circle on the compositor; paused while off screen. */
+@keyframes globe-turn {
+  to { transform: rotate(360deg); }
+}
+.globe-turn {
+  animation: globe-turn 48s linear infinite;
+  will-change: transform;
+}
+.globe-turn[data-paused="true"] {
+  animation-play-state: paused;
+}
+
+/* Pricing: white, a band of Hushgate blue behind the card, then white again. */
+.pricing-sky {
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 30%, #dbe8fc 40%, #a9c8f6 52%, #7c9cf3 64%, #5670ec 76%, #4055d6 84%, #b9c5f4 93%, #ffffff 100%);
+}
+
+/* Hero sky: Hushgate cobalt at the top, opening into daylight above the hills. */
+.hero-sky {
+  background: linear-gradient(180deg, #3446d9 0%, #4459ea 12%, #5a78f2 26%, #7a9ff4 42%, #94bdf5 58%, #a7cdf5 72%, #b5d7f6 100%);
+}
+
+.hero-hills {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, transparent 18%, rgba(0, 0, 0, 0.55) 38%, #000 56%);
+  mask-image: linear-gradient(180deg, transparent 0%, transparent 18%, rgba(0, 0, 0, 0.55) 38%, #000 56%);
+}
+
+.device-fade {
+  -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 96%);
+  mask-image: linear-gradient(180deg, #000 45%, transparent 96%);
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(18px); filter: blur(12px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+
+@utility animate-rise {
+  animation: rise-in 900ms var(--ease-out-soft) both;
+}
+
+/* A muted continuation for large statement copy, like a sentence fading out. */
+@utility text-fade {
+  color: var(--color-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .globe-turn,
+  .orbit,
+  .orbit-counter {
+    animation: none !important;
+  }
+}
