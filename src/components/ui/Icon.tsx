@@ -8,7 +8,7 @@ export type IconName =
   | "gate" | "unplug" | "leak" | "pin" | "split" | "autoPower" | "pause" | "lock" | "noLog"
   | "arrowRight" | "arrowUpRight" | "check" | "plus" | "chrome" | "user" | "server" | "route"
   | "signal" | "search" | "logout" | "menu" | "close" | "mail" | "globe" | "shieldless" | "clock" | "key" | "eye" | "eyeOff"
-  | "home" | "card" | "users" | "sliders" | "pulse" | "trash" | "calendar" | "copy" | "chevronDown";
+  | "home" | "card" | "users" | "sliders" | "pulse" | "trash" | "calendar" | "copy" | "chevronDown" | "gift";
 
 const paths: Record<IconName, React.ReactNode> = {
   // An arched doorway with a threshold: the Hushgate idea.
@@ -50,6 +50,7 @@ const paths: Record<IconName, React.ReactNode> = {
   pulse: <path d="M3 12h4l2.5-6 5 12 2.5-6h4" />,
   trash: <><path d="M4.5 7h15M10 4h4M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7" /><path d="M10 11v5M14 11v5" /></>,
   calendar: <><rect x="4" y="5.5" width="16" height="14" rx="2.5" /><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" /></>,
+  gift: <><rect x="3.5" y="8" width="17" height="4.5" rx="1" /><path d="M5 12.5v6.8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6.8M12 8v12.3M12 8S10.6 3.6 8.1 4c-2 .3-1.7 3.4.4 4M12 8s1.4-4.4 3.9-4c2 .3 1.7 3.4-.4 4" /></>,
   copy: <><rect x="8.5" y="8.5" width="11" height="11" rx="2.2" /><path d="M15.5 8.5V6.2A1.7 1.7 0 0 0 13.8 4.5H6.2A1.7 1.7 0 0 0 4.5 6.2v7.6a1.7 1.7 0 0 0 1.7 1.7h2.3" /></>,
   chevronDown: <path d="m6.5 9.5 5.5 5.5 5.5-5.5" />,
   eyeOff: <><path d="M10 5.8c.6-.2 1.3-.3 2-.3 6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.6 3.5M6.3 7.3A16.6 16.6 0 0 0 2.5 12S6 18.5 12 18.5c1.7 0 3.2-.5 4.5-1.2" /><path d="m3.5 3.5 17 17" /></>,

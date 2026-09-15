@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 const permissions: [string, string][] = [
   ["proxy", "Routes Chrome's traffic through the Hushgate server you choose, and restores your normal connection when you disconnect."],
   ["webRequest and webRequestAuthProvider", "Answers the sign-in challenge from our own proxy server with your short-lived session credentials. Hushgate ignores challenges from any other server."],
-  ["declarativeNetRequest", "Powers the kill switch: if the tunnel drops, it blocks Chrome from loading pages until protection is back."],
+  ["declarativeNetRequest", "Powers the kill switch, which blocks Chrome from loading pages if the tunnel drops, and Threat Protection, which blocks known malware, ad and tracker domains using lists packaged inside the extension. Chrome does the matching on your device; nothing about the pages you visit is sent to us."],
   ["privacy", "Turns on WebRTC leak protection while you are connected so web apps cannot discover your real IP address."],
-  ["scripting", "Adds a small script to pages only while location matching is on, so sites that ask for your location see your server's city."],
+  ["scripting", "Adds small scripts to pages only while location matching is on, so sites that ask for your location or time zone see your server's city instead of yours."],
   ["storage", "Saves your settings and your current sign-in on your device."],
   ["alarms", "Checks the connection every minute, renews your session before it expires and ends a pause on time."],
   ["notifications", "Tells you when protection drops, recovers or needs you to sign in again. You can turn these off in Settings."],

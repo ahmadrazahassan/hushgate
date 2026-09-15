@@ -47,6 +47,10 @@ export function describeAudit(entry: AuditEntry): string {
       return detail.to === "admin" ? "Made them an admin" : "Removed admin access";
     case "delete":
       return "Deleted the account";
+    case "assign_dedicated_ip":
+      return `Gave them the dedicated IP ${String(detail.location_id)}`;
+    case "release_dedicated_ip":
+      return `Released the dedicated IP ${String(detail.location_id)}`;
     case "sign_out_everywhere":
       return `Signed them out everywhere (${String(detail.ended ?? 0)} VPN sessions ended)`;
     default:

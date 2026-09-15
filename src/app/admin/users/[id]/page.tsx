@@ -1,26 +1,48 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { deleteUser, extendTrial, setBlocked, setPlan, setRole, signOutEverywhere } from "@/app/admin/actions";
+import { assignDedicatedIp, deleteUser, extendTrial, releaseDedicatedIp, setBlocked, setPlan, setRole, signOutEverywhere } from "@/app/admin/actions";
 import { SubmitButton } from "@/components/app/SubmitButton";
 import { Badge, Card, dangerButton, Empty, ghostButton, inputClass, Notice, one, PanelTitle, Row, selectClass } from "@/components/app/ui";
 import { Icon } from "@/components/ui/Icon";
 import { accessState, formatDateTime, formatDay, planLabels, PROFILE_COLUMNS, relativeTime, type PlanId, type Profile } from "@/lib/account";
 import { accessBadge, describeAudit, type AuditEntry } from "@/lib/admin";
 import { requireAdmin } from "@/lib/auth";
-import { gatewayConfigured } from "@/lib/gateway";
+import { gateway, gatewayConfigured, type GatewayLocation } from "@/lib/gateway";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Manage account" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+async function gatewayLocations(): Promise<GatewayLocation[] | null> {
+  if (!gatewayConfigured()) return null;
+  try {
+    return (await gateway.overview()).locations;
+  } catch {
+    return null;
+  }
+}
+
 async function load(id: string) {
   const supabase = await createClient();
-  const [profile, audit] = await Promise.all([
+  const [profile, audit, dedicated, invited, locations] = await Promise.all([
     supabase.from("profiles").select(PROFILE_COLUMNS).eq("id", id).maybeSingle<Profile>(),
     supabase.from("admin_audit").select("*").eq("target_id", id).order("created_at", { ascending: false }).limit(20),
+    supabase.from("dedicated_ips").select("location_id, assigned_at").eq("user_id", id).maybeSingle<{ location_id: string; assigned_at: string }>(),
+    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("referred_by", id),
+    gatewayLocations(),
   ]);
-  return { profile: profile.data, audit: (audit.data as AuditEntry[] | null) ?? [], now: Date.now() };
+  const referrerId = profile.data?.referred_by;
+  const referrer = referrerId ? (await supabase.from("profiles").select("email").eq("id", referrerId).maybeSingle<{ email: string }>()).data : null;
+  return {
+    profile: profile.data,
+    audit: (audit.data as AuditEntry[] | null) ?? [],
+    dedicated: dedicated.data,
+    invitedCount: invited.count ?? 0,
+    referrerEmail: referrer?.email ?? null,
+    locations,
+    now: Date.now(),
+  };
 }
 
 function Hidden({ id }: { id: string }) {
@@ -29,12 +51,19 @@ function Hidden({ id }: { id: string }) {
 
 const chevron = <Icon name="chevronDown" className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-slate" />;
 
+function referrerId(profile: Profile, email: string | null) {
+  if (!profile.referred_by) return "—";
+  return <Link href={`/admin/users/${profile.referred_by}`} className="font-semibold text-cobalt hover:text-ink [overflow-wrap:anywhere]">{email ?? "Deleted account"}</Link>;
+}
+
 export default async function ManageUserPage({ params, searchParams }: PageProps<"/admin/users/[id]">) {
   const { id } = await params;
   if (!UUID.test(id)) notFound();
   const viewer = await requireAdmin(`/admin/users/${id}`);
   const query = await searchParams;
-  const { profile, audit, now } = await load(id);
+  const { profile, audit, dedicated, invitedCount, referrerEmail, locations, now } = await load(id);
+  const freeLocations = (locations ?? []).filter((location) => !location.dedicatedTo || location.dedicatedTo === profile?.id);
+  const dedicatedLocation = dedicated ? locations?.find((location) => location.id === dedicated.location_id) : undefined;
   if (!profile) notFound();
 
   const self = profile.id === viewer.userId;
@@ -65,6 +94,9 @@ export default async function ManageUserPage({ params, searchParams }: PageProps
             <Row label="Last sign-in">{relativeTime(profile.last_sign_in_at, now)}</Row>
             <Row label="Favourite location">{profile.preferred_location ?? "Fastest"}</Row>
             <Row label="Product emails">{profile.product_emails ? "Yes" : "No"}</Row>
+            <Row label="Invite code"><code className="font-mono text-[12px]">{profile.referral_code ?? "—"}</code></Row>
+            <Row label="Invited by">{referrerId(profile, referrerEmail)}</Row>
+            <Row label="People they invited">{invitedCount}</Row>
             <Row label="User ID"><code className="font-mono text-[12px]">{profile.id}</code></Row>
           </dl>
         </Card>
@@ -98,6 +130,40 @@ export default async function ManageUserPage({ params, searchParams }: PageProps
               </form>
             </div>
             <p className="mt-4 text-[13px] leading-relaxed text-muted">A paid plan adds its length to the current paid access. “Free trial” removes paid access. “Complimentary” never expires.</p>
+          </Card>
+
+          <Card title="Dedicated IP" icon="pin">
+            {dedicated ? (
+              <div className="space-y-3">
+                <p className="text-[14px] leading-relaxed">
+                  <strong className="font-semibold">{dedicatedLocation ? `${dedicatedLocation.displayName}, ${dedicatedLocation.countryName}` : dedicated.location_id}</strong>
+                  {dedicatedLocation && <span className="font-mono text-[13px] text-slate"> · {dedicatedLocation.exitIp}</span>}
+                  <span className="block text-[13px] text-muted">Reserved {formatDateTime(dedicated.assigned_at)}. Nobody else can connect to it.</span>
+                </p>
+                <form action={releaseDedicatedIp}>
+                  <Hidden id={profile.id} />
+                  <SubmitButton pendingText="Releasing…" className={ghostButton}>Release dedicated IP</SubmitButton>
+                </form>
+              </div>
+            ) : (
+              <form action={assignDedicatedIp} className="space-y-2.5">
+                <Hidden id={profile.id} />
+                <span className="text-[14px] font-medium">Reserve one location for this account only</span>
+                {locations ? (
+                  <span className="relative block">
+                    <select name="locationId" required defaultValue="" className={selectClass}>
+                      <option value="" disabled>Choose a location</option>
+                      {freeLocations.map((location) => <option key={location.id} value={location.id}>{location.displayName} · {location.exitIp}</option>)}
+                    </select>
+                    {chevron}
+                  </span>
+                ) : (
+                  <input name="locationId" required pattern="[a-z0-9-]{1,40}" placeholder="Location id, for example us-lax-07" className={inputClass} />
+                )}
+                <SubmitButton pendingText="Reserving…" className={`${ghostButton} w-full`}>Reserve IP</SubmitButton>
+                <p className="text-[13px] leading-relaxed text-muted">The location disappears for everyone else and their sessions on it end within a minute. Checkout for this add-on is not live yet, so reserve it after a manual payment.</p>
+              </form>
+            )}
           </Card>
 
           {!self && (

@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import { StrengthMeter } from "@/components/app/PasswordForm";
 import { AuthField, AuthMessage, AuthTitle, authButton } from "@/components/auth/AuthParts";
 import { Icon } from "@/components/ui/Icon";
+import { REFERRAL_CODE, REFERRAL_DAYS } from "@/lib/account";
 import { createClient } from "@/lib/supabase/client";
+
+const noSubscription = () => () => {};
 
 export default function SignupPage() {
   const router = useRouter();
@@ -15,6 +18,10 @@ export default function SignupPage() {
   const [sentTo, setSentTo] = useState("");
   const [pending, setPending] = useState(false);
   const [resend, setResend] = useState<{ state: "idle" | "sending" | "sent" | "error"; wait: number }>({ state: "idle", wait: 0 });
+  // Invite links look like /signup?ref=abcd2345. The code is only a hint for the database, which checks it.
+  const search = useSyncExternalStore(noSubscription, () => window.location.search, () => "");
+  const code = (new URLSearchParams(search).get("ref") ?? "").trim().toLowerCase();
+  const referral = REFERRAL_CODE.test(code) ? code : "";
 
   useEffect(() => {
     if (resend.wait <= 0) return;
@@ -48,7 +55,7 @@ export default function SignupPage() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback?next=/account`,
-        data: fullName ? { full_name: fullName } : undefined,
+        data: fullName || referral ? { ...(fullName ? { full_name: fullName } : {}), ...(referral ? { referral_code: referral } : {}) } : undefined,
       },
     });
     setPending(false);
@@ -99,7 +106,13 @@ export default function SignupPage() {
 
   return (
     <>
-      <AuthTitle title="Start with" serif="14 days free.">No card needed. One account works in Chrome on every computer you use.</AuthTitle>
+      <AuthTitle title="Start with" serif={referral ? `${14 + REFERRAL_DAYS} days free.` : "14 days free."}>No card needed. One account works in Chrome on every computer you use.</AuthTitle>
+      {referral && (
+        <p className="mt-6 flex items-start gap-3 rounded-[16px] bg-cobalt-soft px-4 py-3 text-[14px] leading-relaxed text-cobalt-deep">
+          <Icon name="gift" className="mt-0.5 size-5 shrink-0" />
+          <span>You were invited. Confirm your email and you both get {REFERRAL_DAYS} extra days.</span>
+        </p>
+      )}
       <form onSubmit={onSubmit} className="mt-9 space-y-5">
         <AuthField label="Name" icon="user" name="fullName" autoComplete="name" maxLength={80} placeholder="Optional" />
         <AuthField label="Email" icon="mail" name="email" type="email" autoComplete="email" required placeholder="you@example.com" />

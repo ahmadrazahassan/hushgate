@@ -15,6 +15,8 @@ const credits: [string, string, string][] = [
   ["Next.js", "MIT License", "https://github.com/vercel/next.js"],
   ["Tailwind CSS", "MIT License", "https://github.com/tailwindlabs/tailwindcss"],
   ["Supabase client libraries", "MIT License", "https://github.com/supabase/supabase-js"],
+  ["URLhaus and ThreatFox host files by abuse.ch (Threat Protection malware list)", "CC0 1.0", "https://abuse.ch/"],
+  ["EasyList and EasyPrivacy (Threat Protection ad and tracker list, domain rules only)", "Creative Commons Attribution-ShareAlike 3.0, or GPL 3.0", "https://easylist.to/"],
 ];
 
 export default function LicensesPage() {

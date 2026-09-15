@@ -17,10 +17,25 @@ export interface Profile {
   last_sign_in_at: string | null;
   created_at: string;
   updated_at: string;
+  referral_code: string | null;
+  referred_by: string | null;
 }
 
 export const PROFILE_COLUMNS =
-  "id, email, full_name, role, blocked, blocked_reason, plan, trial_ends_at, access_ends_at, preferred_location, product_emails, last_sign_in_at, created_at, updated_at";
+  "id, email, full_name, role, blocked, blocked_reason, plan, trial_ends_at, access_ends_at, preferred_location, product_emails, last_sign_in_at, created_at, updated_at, referral_code, referred_by";
+
+export const REFERRAL_CODE = /^[a-z0-9]{8}$/;
+export const REFERRAL_DAYS = 7;
+export const REFERRAL_LIMIT = 10;
+
+export interface Referrals {
+  code: string | null;
+  rewarded: number;
+  joined: number;
+  pending: number;
+  limit: number;
+  days: number;
+}
 
 export const planLabels: Record<PlanId, string> = {
   trial: "Free trial",

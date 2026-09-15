@@ -27,7 +27,7 @@ function userPath(userId: string) {
 /** Database errors raised by the admin functions are written for people; anything else gets a plain fallback. */
 function explain(error: { code?: string; message?: string } | null): string {
   if (!error) return "";
-  if (error.code && ["42501", "22023", "P0002"].includes(error.code) && error.message) return error.message.endsWith(".") ? error.message : `${error.message}.`;
+  if (error.code && ["42501", "22023", "P0002", "23505"].includes(error.code) && error.message) return error.message.endsWith(".") ? error.message : `${error.message}.`;
   return "That did not work. Try again.";
 }
 
@@ -105,6 +105,29 @@ export async function signOutEverywhere(form: FormData) {
   await supabase.rpc("admin_record", { action: "sign_out_everywhere", target_id: userId, detail: { ended } });
   revalidatePath("/admin", "layout");
   back(path, "ok", `Signed out of Hushgate everywhere. Ended ${ended} VPN ${ended === 1 ? "session" : "sessions"}.`);
+}
+
+export async function assignDedicatedIp(form: FormData) {
+  await requireAdmin();
+  const userId = field(form, "userId");
+  const locationId = field(form, "locationId");
+  const path = userPath(userId);
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_assign_dedicated_ip", { target_id: userId, p_location_id: locationId });
+  if (error) back(path, "error", explain(error));
+  revalidatePath("/admin", "layout");
+  back(path, "ok", `${locationId} is now their dedicated IP. The VPN servers apply it within a minute and end anyone else's sessions on it.`);
+}
+
+export async function releaseDedicatedIp(form: FormData) {
+  await requireAdmin();
+  const userId = field(form, "userId");
+  const path = userPath(userId);
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_release_dedicated_ip", { target_id: userId });
+  if (error) back(path, "error", explain(error));
+  revalidatePath("/admin", "layout");
+  back(path, "ok", "Dedicated IP released. It returns to the shared pool within a minute.");
 }
 
 export async function deleteUser(form: FormData) {

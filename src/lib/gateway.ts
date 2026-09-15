@@ -28,6 +28,8 @@ export interface GatewayLocation {
   available: boolean;
   enabled: boolean;
   region: string;
+  /** User id the location is reserved for as a dedicated IP, if any. */
+  dedicatedTo?: string | null;
 }
 
 export interface GatewayOverview {
