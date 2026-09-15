@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ExtensionShot } from "@/components/site/ExtensionShot";
 import { FaqGrid, type FaqItem } from "@/components/site/FaqGrid";
 import { FeatureGrid } from "@/components/site/FeatureGrid";
@@ -109,8 +110,9 @@ export default function HomePage() {
             <BlurText text="Frequently asked questions" />
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-[17px] leading-relaxed text-slate md:text-[19px]">
-            Everything about Hushgate, the free trial and your privacy. Still stuck? Email{" "}
-            <a className="font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink" href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>.
+            Everything about Hushgate, the free trial and your privacy. Still stuck?{" "}
+            <Link className="font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink" href="/contact">Talk to support</Link>{" "}
+            or email <a className="font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink" href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>.
           </p>
         </div>
         <div className="mx-auto mt-12 max-w-[1080px] md:mt-16">

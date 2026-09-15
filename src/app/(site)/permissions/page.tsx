@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/site/LegalPage";
+import { LEGAL_UPDATED } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Extension permissions",
@@ -21,8 +22,11 @@ const permissions: [string, string][] = [
 export default function PermissionsPage() {
   return (
     <LegalPage
+      path="/permissions"
+      icon="puzzle"
       title="Extension permissions"
-      updated="15 September 2026"
+      serif="Every one explained."
+      updated={LEGAL_UPDATED}
       intro={<p>Chrome shows a list of permissions when you install Hushgate. Here is what each one is for, in plain words.</p>}
       sections={permissions.map(([name, reason]) => ({ title: name, body: <p>{reason}</p> }))}
     />

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/site/LegalPage";
+import { LEGAL_UPDATED } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Open-source licences",
@@ -22,8 +23,11 @@ const credits: [string, string, string][] = [
 export default function LicensesPage() {
   return (
     <LegalPage
+      path="/licenses"
+      icon="book"
       title="Open-source licences"
-      updated="15 September 2026"
+      serif="Thank you."
+      updated={LEGAL_UPDATED}
       intro={<p>Hushgate is built with excellent open-source software. Thank you to everyone who maintains it.</p>}
       sections={credits.map(([name, licence, url]) => ({
         title: name,

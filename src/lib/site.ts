@@ -17,3 +17,17 @@ export const reach = {
 
 /** How we describe IP quality. Keep it true: see docs/IP_REPUTATION.md before changing. */
 export const IP_REPUTATION_DETAIL = "Checked against the major spam blocklists";
+
+/** Every policy and reference page, in the order they appear in legal navigation. */
+export const legalPages = [
+  { href: "/privacy", label: "Privacy policy" },
+  { href: "/terms", label: "Terms of service" },
+  { href: "/refunds", label: "Refunds and cancellation" },
+  { href: "/acceptable-use", label: "Acceptable use" },
+  { href: "/cookies", label: "Cookie policy" },
+  { href: "/permissions", label: "Extension permissions" },
+  { href: "/licenses", label: "Open-source licences" },
+] as const;
+
+/** When the policies last changed. Update alongside the text. */
+export const LEGAL_UPDATED = "16 September 2026";

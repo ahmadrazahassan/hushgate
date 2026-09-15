@@ -7,7 +7,7 @@ import { site } from "@/lib/site";
 
 const columns = [
   {
-    title: "Menu",
+    title: "Product",
     links: [
       { href: "/", label: "Home" },
       { href: "/#features", label: "Features" },
@@ -17,34 +17,44 @@ const columns = [
     ],
   },
   {
-    title: "Navigation",
-    links: [
-      { href: `mailto:${site.supportEmail}`, label: "Contact" },
-      { href: "/privacy", label: "Privacy policy" },
-      { href: "/terms", label: "Terms of service" },
-      { href: "/permissions", label: "Extension permissions" },
-      { href: "/licenses", label: "Open-source licences" },
-    ],
-  },
-  {
     title: "Get Hushgate",
     links: [
       { href: "/download", label: "Chrome extension" },
+      { href: "/signup", label: "Start free trial" },
       { href: "/download", label: "iPhone and iPad", soon: true },
       { href: "/download", label: "Android", soon: true },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { href: "/contact", label: "Contact support" },
+      { href: `mailto:${site.supportEmail}`, label: site.supportEmail },
+      { href: "/permissions", label: "Extension permissions" },
       { href: "/reset-password", label: "Reset password" },
+      { href: "/account", label: "Your account" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { href: "/privacy", label: "Privacy policy" },
+      { href: "/terms", label: "Terms of service" },
+      { href: "/refunds", label: "Refunds and cancellation" },
+      { href: "/acceptable-use", label: "Acceptable use" },
+      { href: "/cookies", label: "Cookie policy" },
+      { href: "/licenses", label: "Open-source licences" },
     ],
   },
 ];
-
 export function SiteFooter({ installHref }: { installHref: string }) {
   return (
     <footer className="relative mt-12 overflow-hidden bg-[#0b0d12] text-white">
       {/* The white page reaches into the footer as an inverted notch. */}
       <div className="notch-white absolute top-0 left-1/2 h-[30px] w-[calc(100%-72px)] -translate-x-1/2 rounded-b-[14px] md:h-9 md:w-[51%] bg-white" aria-hidden="true" />
 
-      <div className="container-page relative z-10 grid grid-cols-2 gap-x-6 gap-y-12 pt-24 pb-10 md:grid-cols-[1.5fr_repeat(3,1fr)] md:gap-8 md:pt-28">
-        <div className="col-span-2 max-w-sm md:col-span-1">
+      <div className="container-page relative z-10 grid grid-cols-2 gap-x-6 gap-y-12 pt-24 pb-10 md:grid-cols-3 md:gap-8 lg:grid-cols-[1.4fr_repeat(4,1fr)] md:pt-28">
+        <div className="col-span-2 max-w-sm md:col-span-3 lg:col-span-1">
           <Link href="/" className="inline-flex items-center gap-2.5">
             <AppTile size={30} />
             <span className="font-display text-[18px] font-bold tracking-[-0.02em]">Hushgate</span>

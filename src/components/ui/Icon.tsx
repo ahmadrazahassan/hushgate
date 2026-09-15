@@ -8,7 +8,8 @@ export type IconName =
   | "gate" | "unplug" | "leak" | "pin" | "split" | "autoPower" | "pause" | "lock" | "noLog"
   | "arrowRight" | "arrowUpRight" | "check" | "plus" | "chrome" | "user" | "server" | "route"
   | "signal" | "search" | "logout" | "menu" | "close" | "mail" | "globe" | "shieldless" | "clock" | "key" | "eye" | "eyeOff"
-  | "home" | "card" | "users" | "sliders" | "pulse" | "trash" | "calendar" | "copy" | "chevronDown" | "gift";
+  | "home" | "card" | "users" | "sliders" | "pulse" | "trash" | "calendar" | "copy" | "chevronDown" | "gift"
+  | "message" | "download" | "file" | "refresh" | "puzzle" | "power" | "book" | "scale" | "cookie" | "phone";
 
 const paths: Record<IconName, React.ReactNode> = {
   // An arched doorway with a threshold: the Hushgate idea.
@@ -54,6 +55,17 @@ const paths: Record<IconName, React.ReactNode> = {
   copy: <><rect x="8.5" y="8.5" width="11" height="11" rx="2.2" /><path d="M15.5 8.5V6.2A1.7 1.7 0 0 0 13.8 4.5H6.2A1.7 1.7 0 0 0 4.5 6.2v7.6a1.7 1.7 0 0 0 1.7 1.7h2.3" /></>,
   chevronDown: <path d="m6.5 9.5 5.5 5.5 5.5-5.5" />,
   eyeOff: <><path d="M10 5.8c.6-.2 1.3-.3 2-.3 6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.6 3.5M6.3 7.3A16.6 16.6 0 0 0 2.5 12S6 18.5 12 18.5c1.7 0 3.2-.5 4.5-1.2" /><path d="m3.5 3.5 17 17" /></>,
+  message: <><path d="M4.5 6.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H10l-4 3.5v-3.5a1.5 1.5 0 0 1-1.5-1.5Z" /><path d="M8.5 9.5h7M8.5 12.5h4" /></>,
+  download: <><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5" /><path d="M5 19.5h14" /></>,
+  file: <><path d="M6.5 3.5h7l4 4v13h-11Z" /><path d="M13.5 3.5v4h4M9.5 12h5M9.5 15.5h5" /></>,
+  refresh: <><path d="M19.5 12a7.5 7.5 0 0 1-13.1 5" /><path d="M4.5 12a7.5 7.5 0 0 1 13.1-5" /><path d="M17.8 3.5v3.7h-3.7M6.2 20.5v-3.7h3.7" /></>,
+  // A puzzle piece: Chrome's extensions menu.
+  puzzle: <path d="M5 8.5h3.2a2 2 0 1 1 3.6 0H15v3.2a2 2 0 1 1 0 3.6V19H11.8a2 2 0 1 0-3.6 0H5v-3.7a2 2 0 1 0 0-3.6Z" />,
+  power: <><path d="M12 3.5V11" /><path d="M7.2 6.5a7 7 0 1 0 9.6 0" /></>,
+  book: <><path d="M4.5 5.5c2.8-.9 5.3-.6 7.5 1v13c-2.2-1.6-4.7-1.9-7.5-1Z" /><path d="M19.5 5.5c-2.8-.9-5.3-.6-7.5 1v13c2.2-1.6 4.7-1.9 7.5-1Z" /></>,
+  scale: <><path d="M12 4v16M8 20h8M5.5 7.5h13" /><path d="m5.5 7.5-2.5 6a2.5 2.5 0 0 0 5 0Zm13 0-2.5 6a2.5 2.5 0 0 0 5 0Z" /></>,
+  cookie: <><path d="M20.3 12.6A8.5 8.5 0 1 1 11.4 3.7a3 3 0 0 0 3.6 3.6 3 3 0 0 0 5.3 5.3Z" /><path d="M8.5 10h.01M9.5 15h.01M14 13.5h.01" /></>,
+  phone: <><rect x="7" y="3" width="10" height="18" rx="2.5" /><path d="M11 17.5h2" /></>,
 };
 
 export function Icon({ name, className = "size-5", ...props }: { name: IconName } & SVGProps<SVGSVGElement>) {

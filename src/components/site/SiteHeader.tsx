@@ -13,6 +13,7 @@ const links = [
   { href: "/#pricing", label: "Pricing" },
   { href: "/#faq", label: "FAQ" },
   { href: "/download", label: "Download" },
+  { href: "/contact", label: "Support" },
 ];
 
 /** Glossy app tile: the Hushgate mark in white on a cobalt squircle. */
