@@ -7,6 +7,13 @@ import { publicSupabase } from "@/lib/env";
  * Authorization itself happens in `requireAdmin()` on every page and action.
  */
 export async function proxy(request: NextRequest) {
+  // Email links whose redirect fell back to the site root: finish them on the callback route.
+  if (request.nextUrl.pathname === "/" && request.nextUrl.searchParams.has("code")) {
+    const callback = request.nextUrl.clone();
+    callback.pathname = "/auth/callback";
+    callback.search = `?code=${encodeURIComponent(request.nextUrl.searchParams.get("code") ?? "")}&next=/account`;
+    return NextResponse.redirect(callback);
+  }
   const supabase = publicSupabase();
   let response = NextResponse.next({ request });
   if (!supabase) return response;
@@ -33,9 +40,15 @@ export async function proxy(request: NextRequest) {
     login.search = `?next=${encodeURIComponent(request.nextUrl.pathname)}`;
     return NextResponse.redirect(login);
   }
+  if (data?.claims && (pathname === "/login" || pathname === "/signup")) {
+    const account = request.nextUrl.clone();
+    account.pathname = "/account";
+    account.search = "";
+    return NextResponse.redirect(account);
+  }
   return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/account/:path*", "/login", "/signup", "/auth/:path*", "/update-password"],
+  matcher: ["/", "/admin/:path*", "/account/:path*", "/login", "/signup", "/auth/:path*", "/update-password"],
 };

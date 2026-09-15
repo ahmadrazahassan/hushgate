@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     description: site.description,
   },
   twitter: { card: "summary_large_image" },
+  verification: { google: "Q3oFMi5OVU7XWzbV3Mnk4vMUMzMXqkYd4-KSD2JhrZY" },
 };
 
 export const viewport: Viewport = {

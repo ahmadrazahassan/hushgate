@@ -12,7 +12,8 @@ const chips = [
   { label: "Fastest", count: null, flag: null },
   { label: "Germany", count: 6, flag: "DE" },
   { label: "Canada", count: 6, flag: "CA" },
-  { label: "United States", count: 7, flag: "US" },
+  { label: "United Kingdom", count: 5, flag: "GB" },
+  { label: "United States", count: 17, flag: "US" },
 ] as const;
 
 function Popup({ name, alt, className }: { name: string; alt: string; className: string }) {

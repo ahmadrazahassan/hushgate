@@ -13,5 +13,8 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(`${origin}${next}`);
   }
-  return NextResponse.redirect(`${origin}/reset-password?expired=1`);
+  // Password resets need a fresh link. Sign-up links were already confirmed by Supabase before
+  // redirecting here, even when this browser cannot open a session (sign-up began in the extension).
+  if (next.startsWith("/update-password")) return NextResponse.redirect(`${origin}/reset-password?expired=1`);
+  return NextResponse.redirect(`${origin}/login?confirmed=1&next=${encodeURIComponent(next)}`);
 }

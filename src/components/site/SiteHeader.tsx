@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ChromeLogo } from "@/components/ui/BrandLogos";
 import { Icon } from "@/components/ui/Icon";
+import { createClient } from "@/lib/supabase/client";
 
 const links = [
   { href: "/#features", label: "Features" },
@@ -34,6 +35,15 @@ export function AppTile({ size = 36 }: { size?: number }) {
 export function SiteHeader({ installHref }: { installHref: string }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    let supabase: ReturnType<typeof createClient>;
+    try { supabase = createClient(); } catch { return; }
+    void supabase.auth.getSession().then(({ data }) => setSignedIn(Boolean(data.session)));
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => setSignedIn(Boolean(session)));
+    return () => data.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -63,8 +73,9 @@ export function SiteHeader({ installHref }: { installHref: string }) {
             ))}
           </nav>
 
-          <Link href="/login" className="ml-auto hidden rounded-full px-3 py-2 text-[15px] font-medium tracking-[-0.01em] text-white/80 transition-colors hover:text-white md:ml-1 md:inline-flex">
-            Sign in
+          <Link href={signedIn ? "/account" : "/login"} className="ml-auto hidden items-center gap-1.5 rounded-full px-3 py-2 text-[15px] font-medium tracking-[-0.01em] text-white/80 transition-colors hover:text-white md:ml-1 md:inline-flex">
+            {signedIn && <Icon name="user" className="size-[18px]" />}
+            {signedIn ? "My account" : "Sign in"}
           </Link>
           <Link
             href={installHref}
@@ -93,12 +104,14 @@ export function SiteHeader({ installHref }: { installHref: string }) {
                 {link.label}
               </Link>
             ))}
-            <Link href="/login" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-3 text-[16px] text-white/85 hover:bg-white/5 hover:text-white">
-              Sign in
+            <Link href={signedIn ? "/account" : "/login"} onClick={() => setOpen(false)} className="block rounded-xl px-3 py-3 text-[16px] text-white/85 hover:bg-white/5 hover:text-white">
+              {signedIn ? "My account" : "Sign in"}
             </Link>
-            <Link href="/signup" onClick={() => setOpen(false)} className="cta cta-cobalt mt-2 h-12 w-full text-[15px]">
-              Start free trial
-            </Link>
+            {!signedIn && (
+              <Link href="/signup" onClick={() => setOpen(false)} className="cta cta-cobalt mt-2 h-12 w-full text-[15px]">
+                Start free trial
+              </Link>
+            )}
           </nav>
         )}
       </div>

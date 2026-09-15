@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Sign in", robots: { index: false } }
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const params = await searchParams;
-  const notice = params.deleted ? "Your account has been deleted. Take care." : params.signedOut ? "You are signed out." : "";
+  const notice = params.confirmed ? "Your email is confirmed. Sign in to open your account." : params.deleted ? "Your account has been deleted. Take care." : params.signedOut ? "You are signed out." : "";
   return (
     <>
       <AuthTitle title="Welcome" serif="back.">Sign in to manage your plan, devices and account. It is the same account you use in the extension.</AuthTitle>
