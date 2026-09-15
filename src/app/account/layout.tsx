@@ -21,7 +21,6 @@ export default async function AccountLayout({ children }: LayoutProps<"/account"
     { href: "/account/plan", label: "Plan", icon: "card" },
     { href: "/account/profile", label: "Profile", icon: "sliders" },
     { href: "/account/security", label: "Security", icon: "lock" },
-    ...(viewer.profile.role === "admin" ? [{ href: "/admin", label: "Admin panel", icon: "gate" } as DockItem] : []),
   ];
 
   return (

@@ -14,10 +14,9 @@ export const metadata: Metadata = {
 const items: DockItem[] = [
   { href: "/admin", label: "Overview", icon: "home", exact: true },
   { href: "/admin/users", label: "Users", icon: "users" },
-  { href: "/admin/sessions", label: "Live sessions", icon: "pulse" },
+  { href: "/admin/sessions", label: "Sessions", icon: "pulse" },
   { href: "/admin/locations", label: "Locations", icon: "globe" },
   { href: "/admin/activity", label: "Activity", icon: "clock" },
-  { href: "/account", label: "My account", icon: "user", exact: true },
 ];
 
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {

@@ -1,142 +1,131 @@
-# Hushgate setup: accounts, admin panel and launch
+﻿# Hushgate setup: accounts, panels and launch
 
-This connects the three parts that replace the old staging access code:
+Three parts work together:
 
-1. **Supabase** stores accounts (email + password) and the `profiles` table (role, blocked).
-2. **The gateway** on Toronto verifies Supabase sign-ins, issues its own tokens per user, enforces blocks and exposes a signed admin API.
-3. **This website** is the public site, the account pages (sign-up, reset password) and the admin panel at `/admin`.
+1. **Supabase** (project `hushgate`, ref `sgqfpvntgcgpkjkjpxwy`) stores accounts, the `profiles` table and the admin audit log. Access rules live in the database: `account_access()` decides whether an account may connect (not suspended, and inside the free trial, a paid period or complimentary).
+2. **The gateway** on the VPN servers checks `account_access()` with the user's own sign-in token, issues its own short-lived tokens and exposes a signed admin API for live sessions.
+3. **This website**: the public site, sign-up and sign-in, the account panel at `/account` and the admin panel at `/admin`.
 
-The extension signs people in directly with Supabase, then exchanges that sign-in with the gateway.
-
-> Once the gateway is switched to accounts, the old access code stops working. Anyone using an older build (for example the zip shared earlier) must install the new build and create an account.
+The extension signs people in with Supabase, then exchanges that sign-in with the gateway.
 
 ---
 
-## 1. Create the Supabase project
+## 1. Supabase (done)
 
-1. Go to supabase.com → **New project**. Pick a region close to the Toronto server (for example *East US (North Virginia)* or *Canada Central*).
-2. **Authentication → Sign In / Providers → Email**:
-   - Enable email provider and **Confirm email**.
-   - Minimum password length: **8**.
-3. **Authentication → URL Configuration**:
+Already applied to the `hushgate` project:
+
+- `supabase/migrations/20260915120000_accounts.sql`: profiles, trial and plan fields, row-level security, access check, admin functions and the audit log.
+- `supabase/migrations/20260915121000_hardening.sql`: an index, and removes public access to Supabase's RLS helper.
+
+The website and the extension only use the **publishable key**. No secret key is needed anywhere on the website.
+
+### Still to do in the Supabase dashboard
+
+1. **Authentication → URL Configuration**
    - Site URL: `https://hushgate.uk`
-   - Redirect URLs: `https://hushgate.uk/auth/confirmed`, `https://hushgate.uk/auth/callback`, and for local testing `http://localhost:3000/**`
-4. **Authentication → Emails → SMTP Settings**: add your own SMTP (for example Resend, Postmark or Amazon SES) with a sender like `no-reply@hushgate.uk`. Supabase's built-in email is heavily rate-limited and not meant for real users.
-5. **SQL Editor** → paste and run `supabase/migrations/20260915000000_profiles.sql`.
-   (Or with the Supabase CLI: `supabase link` then `supabase db push`.)
-6. **Project Settings → API Keys**: note the **Project URL**, the **publishable key** (`sb_publishable_…`) and the **secret key** (`sb_secret_…`). Legacy `anon` / `service_role` keys also work.
+   - Redirect URLs: `https://hushgate.uk/**` and `http://localhost:3100/**`
+
+   Without these, confirmation and password-reset emails send people to the wrong address.
+2. **Authentication → Emails → SMTP Settings**: add your own SMTP (Resend, Postmark or Amazon SES) with a sender like `no-reply@hushgate.uk`. Supabase's built-in email sends only a few emails an hour.
+3. **Authentication → Sign In / Providers → Email**: keep **Confirm email** on and set the minimum password length to 8.
 
 ## 2. Run the website locally
 
-```bash
-cp .env.example .env.local
-```
-
-Fill in `.env.local`:
-
-| Variable | Value |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Project URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publishable key |
-| `SUPABASE_SECRET_KEY` | secret key (server only) |
-| `GATEWAY_API_URL` | `https://155-138-149-113.sslip.io` |
-| `GATEWAY_ADMIN_KEY` | generated in step 4 |
-| `NEXT_PUBLIC_CHROME_STORE_URL` | empty until the extension is published |
+`.env.local` already contains the Supabase URL and publishable key.
 
 ```bash
 pnpm install
-pnpm dev
+pnpm build
+pnpm start -p 3100
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3100.
 
 ## 3. Make yourself an admin
 
-1. Create your account at http://localhost:3000/signup and confirm the email.
+1. Create your account at `/signup` and confirm the email.
 2. In Supabase **SQL Editor** run:
 
 ```sql
 update public.profiles set role = 'admin' where email = 'you@example.com';
 ```
 
-3. Sign in at `/login`. You land on `/admin`.
+3. Sign in at `/login`. The dock at the bottom of your account now shows the admin panel.
 
-## 4. Switch the gateway to accounts
+After that, promote or demote other admins from `/admin/users/<id>`. Every change is recorded in `/admin/activity`.
 
-Generate the admin key once (keep it secret; it goes in the gateway and in `GATEWAY_ADMIN_KEY`):
+## 4. Gateway: switch to accounts (done on 15 September 2026)
 
-```bash
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
-
-On the Toronto control plane, as root, store the keys in root-owned files readable by the gateway service only:
+On the control plane (Toronto), as root:
 
 ```bash
 umask 027
-printf '%s' 'sb_publishable_…' > /etc/merlon-gateway/supabase-anon
-printf '%s' 'sb_secret_…'      > /etc/merlon-gateway/supabase-service
-printf '%s' 'THE_ADMIN_KEY'    > /etc/merlon-gateway/admin-key
-chown root:merlon-gateway /etc/merlon-gateway/supabase-anon /etc/merlon-gateway/supabase-service /etc/merlon-gateway/admin-key
-chmod 0640 /etc/merlon-gateway/supabase-anon /etc/merlon-gateway/supabase-service /etc/merlon-gateway/admin-key
+printf '%s' 'sb_publishable_Bbn_k1hN7bN3cbRWTiMFqQ_oeRPxRQs' > /etc/merlon-gateway/supabase-anon
+python3 -c "import secrets; print(secrets.token_urlsafe(48))" > /etc/merlon-gateway/admin-key
+chown root:merlon-gateway /etc/merlon-gateway/supabase-anon /etc/merlon-gateway/admin-key
+chmod 0640 /etc/merlon-gateway/supabase-anon /etc/merlon-gateway/admin-key
 ```
 
-Add these keys to the top level of `/etc/merlon-gateway/config.json` on Toronto:
+Add to the top level of `/etc/merlon-gateway/config.json`:
 
 ```json
 "supabase": {
-  "url": "https://YOUR-PROJECT.supabase.co",
-  "anonKeyFile": "/etc/merlon-gateway/supabase-anon",
-  "serviceKeyFile": "/etc/merlon-gateway/supabase-service"
+  "url": "https://sgqfpvntgcgpkjkjpxwy.supabase.co",
+  "anonKeyFile": "/etc/merlon-gateway/supabase-anon"
 },
 "adminKeyFile": "/etc/merlon-gateway/admin-key"
 ```
 
-Deploy the new `merlon_gateway.py` to Toronto, Frankfurt and Los Angeles (same file everywhere; it now requires TLS 1.3) and restart `merlon-gateway`. Check:
+Deploy the new `merlon_gateway.py` to every server and restart `merlon-gateway`.
 
-```bash
-curl -s https://155-138-149-113.sslip.io/healthz
+- **At sign-in:** access is checked with the user's token, so blocked or expired accounts cannot sign in.
+- **While connected:** to also cut access within a minute of a trial ending, add `"serviceKeyFile"` with the Supabase secret key (server only).
+
+Then set these in the website's environment so the admin panel shows live sessions and can end them:
+
+```
+GATEWAY_API_URL=https://155-138-149-113.sslip.io
+GATEWAY_ADMIN_KEY=<contents of /etc/merlon-gateway/admin-key>
 ```
 
-The local test suite for this code is `vpn-extension/infrastructure/gateway/test_gateway_accounts.py`.
+Tests: `python vpn-extension/infrastructure/gateway/test_gateway_accounts.py`.
 
-## 5. Build the extension with accounts
+## 5. Extension
 
-In `vpn-extension/`:
-
-```bash
-cp .env.example .env
-# WXT_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-# WXT_SUPABASE_ANON_KEY=sb_publishable_…
-pnpm verify
-```
-
-Load `.output/chrome-mv3` in `chrome://extensions`, create an account in the popup, confirm the email, sign in and connect. The account should appear in `/admin/users` and the connection in `/admin/sessions`.
+`vpn-extension/.env` is set to the same Supabase project. `pnpm verify` builds `.output/chrome-mv3`. Create an account in the popup, confirm the email, sign in and connect. When a trial ends, the popup explains it and links to `hushgate.uk/account`.
 
 ## 6. Deploy the website
 
-1. Push this folder to a Git repository and import it in Vercel (framework: Next.js).
-2. Add the same environment variables as `.env.local` in Vercel → Settings → Environment Variables, with `NEXT_PUBLIC_SITE_URL=https://hushgate.uk`.
-3. Vercel → Domains → add `hushgate.uk` and `www.hushgate.uk`, then set the DNS records Vercel shows at your domain registrar.
+1. Import the folder in Vercel (framework: Next.js).
+2. Add the variables from `.env.local` (plus the gateway ones), and `NEXT_PUBLIC_SITE_URL=https://hushgate.uk`.
+3. Add `hushgate.uk` and `www.hushgate.uk` under Domains and set the DNS records Vercel shows.
 
-## 7. Publish to the Chrome Web Store
+## 7. Chrome Web Store
 
-1. Create a developer account at https://chrome.google.com/webstore/devconsole (one-time fee).
-2. `pnpm zip` in `vpn-extension/` and upload the zip.
-3. Listing:
-   - **Privacy policy URL:** `https://hushgate.uk/privacy`
-   - **Single purpose:** "Routes Chrome traffic through the user's chosen Hushgate VPN server."
-   - **Permission justifications:** copy from `https://hushgate.uk/permissions`.
-   - **Data use:** declare *Personally identifiable information (email address)* and *Authentication information*, used only for app functionality, not sold or transferred.
-   - Screenshots: 1280 × 800. Use the popup captures in `public/extension/` on a flat cobalt background.
-4. After approval, set `NEXT_PUBLIC_CHROME_STORE_URL` in Vercel to the listing URL and redeploy. Every "Add to Chrome" button switches to the store link.
+1. Create a developer account at https://chrome.google.com/webstore/devconsole.
+2. `pnpm zip` in `vpn-extension/` and upload.
+3. Listing details:
+   - **Privacy policy:** `https://hushgate.uk/privacy`
+   - **Permission justifications:** from `https://hushgate.uk/permissions`
+   - **Data use:** email address and authentication information, for app functionality only.
+4. After approval, set `NEXT_PUBLIC_CHROME_STORE_URL` and redeploy.
 
-## Admin panel reference
+## Panel reference
 
 | Page | What it does |
 |---|---|
-| `/admin` | Account totals, connected and signed-in users, server health, newest accounts |
-| `/admin/users` | Search accounts; **Block** (ends sessions immediately and refuses sign-in), **Unblock**, **Sign out everywhere**, **Delete** (type the email to confirm) |
-| `/admin/sessions` | Live connections with location and exit IP; **End** a session |
-| `/admin/locations` | Turn a server off or on for new connections |
+| `/account` | Access status (trial days left, paid until, expired or suspended), how to connect, account details |
+| `/account/plan` | Current plan and prices. Checkout opens once a payment provider is connected |
+| `/account/profile` | Name, favourite location, product emails |
+| `/account/security` | Change password, sign out other devices, delete account |
+| `/admin` | Totals, 14-day sign-ups, servers (with the gateway), newest accounts, recent activity |
+| `/admin/users` | Search and filter by trial, paid, expired, suspended or admin |
+| `/admin/users/<id>` | Extend trial, set plan, suspend or restore, make or remove admin, sign out everywhere, delete, history |
+| `/admin/sessions` | Live connections; end one (needs the gateway) |
+| `/admin/locations` | Turn servers on or off for new connections (needs the gateway) |
+| `/admin/activity` | Every admin change, newest first |
 
-Every admin page and action checks the signed-in user's `profiles.role = 'admin'` on the server. The secret key and gateway admin key never reach the browser.
+The database enforces every rule:
+- People can read only their own profile and change only their name, favourite location and email preference.
+- Admin changes go through database functions that check the caller is an admin and record an audit entry.
+- The panel UI hides options that are not allowed, but it is not what enforces the rules.

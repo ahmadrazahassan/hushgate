@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { StrengthMeter } from "@/components/app/PasswordForm";
 import { AuthField, AuthMessage, AuthTitle, authButton } from "@/components/auth/AuthParts";
 import { Icon } from "@/components/ui/Icon";
@@ -14,6 +14,23 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [sentTo, setSentTo] = useState("");
   const [pending, setPending] = useState(false);
+  const [resend, setResend] = useState<{ state: "idle" | "sending" | "sent" | "error"; wait: number }>({ state: "idle", wait: 0 });
+
+  useEffect(() => {
+    if (resend.wait <= 0) return;
+    const timer = window.setTimeout(() => setResend((value) => ({ ...value, wait: value.wait - 1 })), 1000);
+    return () => window.clearTimeout(timer);
+  }, [resend.wait]);
+
+  async function resendConfirmation() {
+    setResend({ state: "sending", wait: 0 });
+    const { error: resendError } = await createClient().auth.resend({
+      type: "signup",
+      email: sentTo,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/account` },
+    });
+    setResend({ state: resendError ? "error" : "sent", wait: 60 });
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,6 +73,7 @@ export default function SignupPage() {
       return;
     }
     setSentTo(email);
+    setResend({ state: "idle", wait: 60 });
   }
 
   if (sentTo) {
@@ -69,7 +87,10 @@ export default function SignupPage() {
             We sent a confirmation link to <strong className="font-semibold text-ink [overflow-wrap:anywhere]">{sentTo}</strong>. Open it to start your 14-day free trial, then sign in to Hushgate in Chrome.
           </AuthTitle>
         </div>
-        <p className="mt-8 text-[14px] text-slate">
+        <button type="button" onClick={resendConfirmation} disabled={resend.wait > 0 || resend.state === "sending"} className={`${authButton} mt-8`}>
+          {resend.state === "sending" ? "Sending…" : resend.wait > 0 ? `${resend.state === "sent" ? "Sent. " : ""}Resend in ${resend.wait}s` : resend.state === "error" ? "Try sending again" : "Resend confirmation email"}
+        </button>
+        <p className="mt-6 text-[14px] text-slate">
           No email after a few minutes? Check spam, or <button type="button" onClick={() => setSentTo("")} className="font-semibold text-ink underline decoration-line underline-offset-4">try another address</button>.
         </p>
       </div>
