@@ -70,7 +70,7 @@ export function LocationsSection({ installHref }: { installHref: string }) {
         >
           <div className="absolute inset-x-[20%] bottom-[2%] h-[10%] rounded-[50%] bg-[#3446d9]/30 blur-3xl" aria-hidden="true" />
           <div className="globe-turn absolute inset-0" data-paused={!live}>
-            <Image src="/globe.png" alt="A glass globe turning slowly" fill unoptimized sizes="120vh" className="object-cover object-center" />
+            <Image src="/globe.webp" alt="A glass globe turning slowly" fill unoptimized sizes="120vh" className="object-cover object-center" />
           </div>
         </motion.div>
 

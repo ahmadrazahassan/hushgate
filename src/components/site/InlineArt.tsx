@@ -5,7 +5,7 @@ import Image from "next/image";
 export function GlobeArt({ className = "" }: { className?: string }) {
   return (
     <span className={`relative inline-block size-[1.02em] align-[-0.16em] ${className}`}>
-      <Image src="/globe.png" alt="" fill unoptimized sizes="96px" className="object-cover" />
+      <Image src="/globe.webp" alt="" fill unoptimized sizes="96px" className="object-cover" />
     </span>
   );
 }

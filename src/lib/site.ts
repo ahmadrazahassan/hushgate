@@ -2,7 +2,7 @@
 export const site = {
   name: "Hushgate",
   domain: "hushgate.uk",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://hushgate.uk",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.hushgate.uk",
   description:
     "Hushgate routes Chrome through encrypted servers in more than 50 countries, with a kill switch and WebRTC leak protection built in.",
   supportEmail: "support@hushgate.uk",

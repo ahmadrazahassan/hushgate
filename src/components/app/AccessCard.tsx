@@ -32,7 +32,7 @@ export function AccessCard({ profile, now }: { profile: Profile; now: number }) 
     <section className="relative overflow-hidden rounded-[34px] bg-[#0b0d12] px-6 py-8 text-white md:px-10 md:py-11">
       <div className="pointer-events-none absolute -top-16 -right-20 size-[340px] opacity-90 md:-top-24 md:-right-10 md:size-[440px]" aria-hidden="true">
         <div className="globe-turn absolute inset-0">
-          <Image src="/globe.png" alt="" fill unoptimized sizes="440px" className="object-cover" />
+          <Image src="/globe.webp" alt="" fill unoptimized sizes="440px" className="object-cover" />
         </div>
       </div>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b0d12] via-[#0b0d12]/85 to-[#0b0d12]/10" aria-hidden="true" />

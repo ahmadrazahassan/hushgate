@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
       {/* Brand side: the same sky and hills as the home page, with the extension in view. */}
       <aside className="relative m-3 hidden overflow-hidden rounded-[36px] text-white lg:block" aria-hidden="true">
         <div className="hero-sky absolute inset-0" />
-        <Image src="/hero/hills.png" alt="" width={1672} height={941} unoptimized priority className="hero-hills absolute bottom-0 left-1/2 h-[62%] w-full max-w-none -translate-x-1/2 object-cover object-[center_80%]" />
+        <Image src="/hero/hills.webp" alt="" width={1672} height={941} unoptimized priority className="hero-hills absolute bottom-0 left-1/2 h-[62%] w-full max-w-none -translate-x-1/2 object-cover object-[center_80%]" />
         <div className="relative flex h-full flex-col p-12 xl:p-14">
           <p className="animate-rise font-display text-[64px] leading-[0.94] font-bold tracking-[-0.055em] xl:text-[84px]">
             Browse quietly.

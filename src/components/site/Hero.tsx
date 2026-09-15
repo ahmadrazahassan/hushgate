@@ -36,7 +36,7 @@ export function Hero({ installHref }: { installHref: string }) {
       {/* Original resolution on purpose: no resizing or recompression. */}
       <HeroLayer y={160} className="absolute inset-0 -z-10">
       <Image
-        src="/hero/hills.png"
+        src="/hero/hills.webp"
         alt=""
         width={1672}
         height={941}
