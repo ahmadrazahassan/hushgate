@@ -24,15 +24,6 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
               </li>
             ))}
           </ul>
-          <Image
-            src="/extension/home-connected.png"
-            alt=""
-            width={960}
-            height={1200}
-            unoptimized
-            priority
-            className="animate-rise absolute right-12 bottom-0 w-[44%] max-w-[330px] rounded-t-[26px] shadow-[0_40px_80px_-30px_rgba(10,20,70,0.6)] [animation-delay:200ms]"
-          />
         </div>
       </aside>
 

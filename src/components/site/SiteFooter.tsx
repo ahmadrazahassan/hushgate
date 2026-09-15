@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AppTile } from "@/components/site/SiteHeader";
 import { ChromeLogo } from "@/components/ui/BrandLogos";
 import { RisingWordmark } from "@/components/site/Motion";
+import { CtaButton } from "@/components/ui/CtaButton";
 import { site } from "@/lib/site";
 
 const columns = [
@@ -56,10 +57,15 @@ export function SiteFooter({ installHref }: { installHref: string }) {
           <p className="mt-5 text-[14px] leading-relaxed text-white/60">
             Hushgate routes Chrome through encrypted servers in more than 50 countries, with a kill switch and leak protection built in.
           </p>
-          <Link href={installHref} className="mt-6 inline-flex h-10 items-center gap-2 rounded-[11px] bg-white px-3.5 text-[14px] font-semibold text-[#0b0d12] transition-transform duration-200 hover:scale-[1.03]">
-            <ChromeLogo className="size-[18px]" />
-            Add to Chrome
-          </Link>
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <CtaButton href={installHref} tone="white" size="md" arrow="right">
+              <ChromeLogo className="size-5" />
+              Add to Chrome
+            </CtaButton>
+            <Link href="/signup" className="inline-flex h-11 items-center rounded-[14px] px-4 text-[14px] font-semibold text-white/80 ring-1 ring-white/15 transition-colors ring-inset hover:bg-white/5 hover:text-white">
+              Start free trial
+            </Link>
+          </div>
           <p className="mt-7 text-[13px] text-white/45">© {new Date().getFullYear()} {site.domain} · All rights reserved</p>
         </div>
 

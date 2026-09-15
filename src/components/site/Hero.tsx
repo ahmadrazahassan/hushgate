@@ -62,13 +62,16 @@ export function Hero({ installHref }: { installHref: string }) {
           Hushgate sends Chrome through encrypted servers in more than 50 countries, with a kill switch and leak protection built in, so websites stop seeing where you really are.
         </p>
 
-        <Offer tone="white" className="animate-rise mt-7 drop-shadow-[0_1px_2px_rgba(20,30,110,0.25)] [animation-delay:200ms]" />
+        <Offer tone="white" className="animate-rise mt-8 [animation-delay:200ms]" />
 
         <div className="animate-rise mt-7 [animation-delay:240ms]">
-          <CtaButton href={installHref} tone="black" size="xl" arrow="right">
-            <ChromeLogo className="size-[26px]" />
-            Add to Chrome
-          </CtaButton>
+          <div className="flex flex-col items-center gap-3 sm:flex-row">
+            <CtaButton href="/signup" tone="cobalt" size="xl" arrow="right">Start free trial</CtaButton>
+            <CtaButton href={installHref} tone="black" size="xl">
+              <ChromeLogo className="size-[26px]" />
+              Add to Chrome
+            </CtaButton>
+          </div>
         </div>
 
         <ul className="animate-rise mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[14px] font-medium text-[#34508a] [animation-delay:300ms] md:text-[15px]">

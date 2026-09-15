@@ -3,16 +3,30 @@ import { plans, savings, TRIAL_DAYS } from "@/lib/pricing";
 const yearly = plans.find((plan) => plan.id === "12m") ?? plans[plans.length - 1];
 export const offerPercent = savings(yearly)?.percent ?? 0;
 
-/** "Special offer: Get 41%¹ off + 14 days free", with footnote 1 explaining the saving. */
+/** "Special offer: 41%¹ off + 14 days free" as a glass ticket, with footnote 1 explaining the saving. */
 export function Offer({ tone = "ink", className = "" }: { tone?: "ink" | "white"; className?: string }) {
-  const accent = tone === "white" ? "text-white" : "text-cobalt";
   return (
-    <p className={`font-display text-[22px] leading-[1.2] font-bold tracking-[-0.025em] md:text-[26px] ${tone === "white" ? "text-white" : "text-ink"} ${className}`}>
-      Special offer: Get <span className={accent}>{offerPercent}%</span>
-      <a href="#footnotes" className="align-super text-[0.5em] font-semibold no-underline" aria-label="See footnote 1">1</a> off
-      <br />
-      <span className={tone === "white" ? "text-white/85" : "text-slate"}>+ {TRIAL_DAYS} days free</span>
-    </p>
+    <div className={className}>
+      <p className={`offer offer-${tone} inline-flex max-w-full items-stretch rounded-full p-[5px]`}>
+        <span className="offer-tag relative z-[1] inline-flex shrink-0 items-center gap-2 rounded-full px-3 text-[10px] font-bold tracking-[0.14em] uppercase sm:px-3.5 sm:text-[11px]">
+          <span className="relative flex size-1.5" aria-hidden="true">
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#7dffb2] opacity-70" />
+            <span className="relative inline-flex size-1.5 rounded-full bg-[#7dffb2]" />
+          </span>
+          <span className="sm:hidden">Offer</span>
+          <span className="hidden sm:inline">Special offer</span>
+        </span>
+        <span className="relative z-[1] flex items-center gap-2.5 py-1 pr-3.5 pl-3 sm:gap-3.5 sm:pr-5 sm:pl-4">
+          <span className="font-display text-[19px] leading-none font-bold tracking-[-0.04em] whitespace-nowrap sm:text-[24px]">
+            {offerPercent}%
+            <a href="#footnotes" className="align-super text-[0.48em] font-semibold no-underline opacity-80" aria-label="See footnote 1">1</a>
+            {" "}off
+          </span>
+          <span className={`h-6 border-l border-dashed sm:h-7 ${tone === "white" ? "border-white/55" : "border-[#151922]/20"}`} aria-hidden="true" />
+          <span className="font-serif text-[19px] leading-none tracking-[-0.01em] whitespace-nowrap italic sm:text-[24px]">+ {TRIAL_DAYS} days free</span>
+        </span>
+      </p>
+    </div>
   );
 }
 

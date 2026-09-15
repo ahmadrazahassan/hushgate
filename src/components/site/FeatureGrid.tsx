@@ -41,8 +41,8 @@ export function FeatureGrid({ installHref }: { installHref: string }) {
               <ChromeLogo className="size-5" />
               Add to Chrome
             </CtaButton>
-            <CtaButton href="#pricing" tone="soft" size="md" arrow="return" className="ml-1.5">
-              See pricing
+            <CtaButton href="/signup" tone="soft" size="md" arrow="return" className="ml-1.5">
+              Start free trial
             </CtaButton>
           </div>
         </Reveal>

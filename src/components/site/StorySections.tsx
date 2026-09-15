@@ -143,7 +143,7 @@ export function FinalCta({ installHref }: { installHref: string }) {
         </Reveal>
 
         <Reveal delay={0.3} className="mt-9 flex flex-wrap items-center justify-center gap-4">
-          <CtaButton href={installHref} tone="cobalt" size="xl" arrow="right">Get started</CtaButton>
+          <CtaButton href="/signup" tone="cobalt" size="xl" arrow="right">Start free trial</CtaButton>
           <CtaButton href={installHref} tone="black" size="xl">
             <ChromeLogo className="size-6" />
             Add to Chrome

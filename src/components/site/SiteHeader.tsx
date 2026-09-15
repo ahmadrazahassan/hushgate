@@ -96,6 +96,9 @@ export function SiteHeader({ installHref }: { installHref: string }) {
             <Link href="/login" onClick={() => setOpen(false)} className="block rounded-xl px-3 py-3 text-[16px] text-white/85 hover:bg-white/5 hover:text-white">
               Sign in
             </Link>
+            <Link href="/signup" onClick={() => setOpen(false)} className="cta cta-cobalt mt-2 h-12 w-full text-[15px]">
+              Start free trial
+            </Link>
           </nav>
         )}
       </div>

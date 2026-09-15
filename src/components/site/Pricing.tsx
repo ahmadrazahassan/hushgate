@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { animate, motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 import { AppTile } from "@/components/site/SiteHeader";
+import { ChromeLogo } from "@/components/ui/BrandLogos";
 import { CtaButton } from "@/components/ui/CtaButton";
 import { BlurText } from "@/components/site/Reveal";
 import { TiltIn } from "@/components/site/Motion";
-import { convert, currencies, formatPrice, plans, RATES_AS_OF, savings, TRIAL_DAYS, type CurrencyCode, type PlanId } from "@/lib/pricing";
+import { convert, currencies, formatPrice, plans, RATES_AS_OF, savings, TRIAL_DAYS, type Currency, type CurrencyCode, type PlanId } from "@/lib/pricing";
 
 const included = [
   `${TRIAL_DAYS}-day free trial`,
@@ -26,6 +28,32 @@ function CheckCircle() {
   );
 }
 
+/** A price that counts from its previous value to the new one when the plan or currency changes. */
+function CountingPrice({ amount, currency, className = "" }: { amount: number; currency: Currency; className?: string }) {
+  const reduced = useReducedMotion();
+  const [shown, setShown] = useState(amount);
+  const from = useRef(amount);
+
+  useEffect(() => {
+    if (reduced || from.current === amount) {
+      from.current = amount;
+      setShown(amount);
+      return;
+    }
+    const controls = animate(from.current, amount, {
+      duration: 0.7,
+      ease: [0.2, 0.8, 0.2, 1],
+      onUpdate: (latest) => {
+        from.current = latest;
+        setShown(latest);
+      },
+    });
+    return () => controls.stop();
+  }, [amount, reduced]);
+
+  return <span className={`tabular-nums ${className}`}>{formatPrice(shown, currency)}</span>;
+}
+
 export function Pricing({ installHref }: { installHref: string }) {
   const [planId, setPlanId] = useState<PlanId>("12m");
   const [currencyCode, setCurrencyCode] = useState<CurrencyCode>("USD");
@@ -34,7 +62,6 @@ export function Pricing({ installHref }: { installHref: string }) {
   const currency = currencies.find((item) => item.code === currencyCode) ?? currencies[0];
   const saving = savings(plan);
   const price = formatPrice(convert(plan.usd, currency), currency);
-  const perMonth = formatPrice(convert(plan.usd / plan.months, currency), currency);
 
   return (
     <section id="pricing" className="pricing-sky relative scroll-mt-16 overflow-hidden pt-8 pb-24 md:pt-12 md:pb-28">
@@ -56,19 +83,35 @@ export function Pricing({ installHref }: { installHref: string }) {
             <span className="font-display text-[17px] font-bold tracking-[-0.02em]">Hushgate for Chrome</span>
           </div>
 
-          <div role="radiogroup" aria-label="Billing period" className="grid grid-cols-4 gap-1 rounded-[16px] bg-white p-1 ring-1 ring-line ring-inset">
+          <div role="radiogroup" aria-label="Billing period" className="grid grid-cols-4 gap-1 rounded-[20px] bg-white p-1.5 shadow-[inset_0_1px_2px_rgba(21,25,34,0.06)] ring-1 ring-line ring-inset">
             {plans.map((item) => {
               const active = item.id === plan.id;
+              const itemSaving = savings(item);
               return (
                 <button
                   key={item.id}
                   type="button"
                   role="radio"
                   aria-checked={active}
+                  aria-label={`${item.label}${itemSaving ? `, save ${itemSaving.percent}%` : ""}`}
                   onClick={() => setPlanId(item.id)}
-                  className={`h-10 rounded-[12px] text-[13px] font-semibold tracking-[-0.01em] transition-colors duration-200 ${active ? "bg-[#0b0d12] text-white" : "text-ink/70 hover:text-ink"}`}
+                  className={`relative flex h-[62px] flex-col items-center justify-center rounded-[15px] transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-cobalt ${active ? "text-white" : "text-ink/75 hover:bg-mist hover:text-ink"}`}
                 >
-                  {item.label}
+                  {active && (
+                    <motion.span
+                      layoutId="plan-pill"
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                      className="absolute inset-0 rounded-[15px] bg-[linear-gradient(180deg,#33363d_0%,#0b0d12_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_8px_18px_-8px_rgba(11,13,18,0.7)]"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <span className="relative font-display text-[21px] leading-none font-bold tracking-[-0.04em] tabular-nums">{item.months}</span>
+                  <span className={`relative mt-1 text-[11px] leading-none font-semibold ${active ? "text-white/70" : "text-muted"}`}>{item.months === 1 ? "month" : "months"}</span>
+                  {itemSaving && (
+                    <span className={`absolute -top-2 right-0.5 rounded-full px-1.5 py-[3px] text-[9.5px] leading-none font-bold tabular-nums shadow-sm transition-colors duration-300 ${active ? "bg-cobalt text-white" : "bg-cobalt-soft text-cobalt"}`}>
+                      -{itemSaving.percent}%
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -94,27 +137,36 @@ export function Pricing({ installHref }: { installHref: string }) {
           </div>
 
           <div className="mt-3 flex items-end justify-center gap-3 text-center" aria-live="polite">
-            <span className="font-display text-[64px] leading-none font-bold tracking-[-0.05em] tabular-nums md:text-[76px]">{price}</span>
+            <CountingPrice amount={convert(plan.usd, currency)} currency={currency} className="font-display text-[64px] leading-none font-bold tracking-[-0.05em] md:text-[76px]" />
             {saving && (
               <span className="mb-2 flex flex-col items-start">
-                <span className="text-[26px] leading-none font-bold tracking-[-0.03em] text-faint line-through decoration-2">{formatPrice(convert(saving.fullUsd, currency), currency)}</span>
+                <CountingPrice amount={convert(saving.fullUsd, currency)} currency={currency} className="text-[26px] leading-none font-bold tracking-[-0.03em] text-faint line-through decoration-2" />
                 <span className="mt-1.5 rounded-full bg-cobalt px-2 py-0.5 text-[12px] font-semibold text-white">Save {saving.percent}%</span>
               </span>
             )}
           </div>
           <p className="mt-2 text-center text-[14px] text-slate">
-            {plan.months === 1 ? "per month" : `for ${plan.label} · about ${perMonth} a month`}
+            {plan.months === 1 ? "per month" : <>for {plan.label} · about <CountingPrice amount={convert(plan.usd / plan.months, currency)} currency={currency} /> a month</>}
           </p>
 
-          <div className="mt-6 rounded-[18px] bg-white p-4 ring-1 ring-line ring-inset">
-            <p className="text-[15px] font-semibold">Free for the first {TRIAL_DAYS} days</p>
-            <div className="mt-3 flex items-center gap-3">
-              <span className="h-2 flex-1 overflow-hidden rounded-full bg-fog">
-                <span className="block h-full w-[7%] rounded-full bg-cobalt" />
-              </span>
-              <span className="text-[12px] text-muted">Then {price}</span>
-            </div>
-          </div>
+          {/* How the trial turns into a plan, in three honest steps. */}
+          <ol className="mt-6 grid grid-cols-3 rounded-[20px] bg-white px-2 pt-4 pb-3.5 ring-1 ring-line ring-inset" aria-label="How the free trial works">
+            {[
+              { when: "Today", what: "Every feature, free", live: true },
+              { when: `Day ${TRIAL_DAYS}`, what: "Trial ends", live: false },
+              { when: "Then", what: `${price} if you stay`, live: false },
+            ].map((step, index) => (
+              <li key={step.when} className="relative flex flex-col items-center px-1 text-center">
+                {index > 0 && <span className="absolute top-[5px] right-1/2 left-[-50%] border-t border-dashed border-line" aria-hidden="true" />}
+                <span className="relative flex size-[11px] items-center justify-center" aria-hidden="true">
+                  {step.live && <span className="absolute inline-flex size-full animate-ping rounded-full bg-cobalt/40" />}
+                  <span className={`relative size-[11px] rounded-full ${step.live ? "bg-cobalt" : "bg-white ring-2 ring-line ring-inset"}`} />
+                </span>
+                <span className={`mt-2.5 text-[13px] font-bold tracking-[-0.01em] ${step.live ? "text-cobalt" : "text-ink"}`}>{step.when}</span>
+                <span className="mt-0.5 text-[12px] leading-snug text-slate">{step.what}</span>
+              </li>
+            ))}
+          </ol>
 
           <ul className="mt-6 space-y-3">
             {included.map((item) => (
@@ -125,9 +177,21 @@ export function Pricing({ installHref }: { installHref: string }) {
             ))}
           </ul>
 
-          <CtaButton href={installHref} tone="cobalt" size="lg" arrow="right" className="mt-7 w-full">
+          <CtaButton href="/signup" tone="cobalt" size="lg" arrow="right" className="mt-7 w-full">
             Start your free trial
           </CtaButton>
+          <p className="mt-3 text-center text-[12.5px] text-muted">No card needed to start.</p>
+
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-line pt-5">
+            <div>
+              <p className="text-[14px] font-semibold text-ink">Already have an account?</p>
+              <p className="text-[13px] text-slate">Sign in from the extension.</p>
+            </div>
+            <a href={installHref} {...(installHref.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="inline-flex h-10 items-center gap-2 rounded-full bg-white pr-4 pl-2.5 text-[14px] font-semibold text-ink shadow-[0_1px_2px_rgba(21,25,34,0.08)] ring-1 ring-line transition duration-200 ring-inset hover:-translate-y-px hover:ring-ink/30">
+              <ChromeLogo className="size-5" />
+              Add to Chrome
+            </a>
+          </div>
         </div>
         </TiltIn>
 

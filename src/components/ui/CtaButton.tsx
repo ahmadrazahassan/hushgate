@@ -36,7 +36,7 @@ export function CtaButton({
   children,
 }: {
   href: string;
-  tone?: "cobalt" | "black" | "soft";
+  tone?: "cobalt" | "black" | "soft" | "white";
   size?: keyof typeof sizes;
   arrow?: "right" | "return";
   className?: string;
