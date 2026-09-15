@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { AuthField, AuthMessage, authButton } from "@/components/auth/AuthParts";
+import { AuthField, AuthMessage } from "@/components/auth/AuthParts";
+import { authButton } from "@/components/auth/authButton";
 import { createClient } from "@/lib/supabase/client";
 
 export function LoginForm({ next }: { next: string }) {

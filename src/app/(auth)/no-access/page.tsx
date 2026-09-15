@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { signOut } from "@/app/account/actions";
-import { AuthTitle, authButton } from "@/components/auth/AuthParts";
+import { AuthTitle } from "@/components/auth/AuthParts";
+import { authButton } from "@/components/auth/authButton";
 
 export const metadata: Metadata = { title: "No access", robots: { index: false } };
 

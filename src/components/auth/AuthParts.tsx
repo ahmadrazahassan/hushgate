@@ -47,5 +47,3 @@ export function AuthMessage({ tone, children }: { tone: "error" | "success" | "i
     </p>
   );
 }
-
-export const authButton = "cta cta-cobalt h-[52px] w-full px-6 text-[16px] disabled:pointer-events-none disabled:opacity-60";

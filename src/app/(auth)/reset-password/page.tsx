@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
-import { AuthField, AuthMessage, AuthTitle, authButton } from "@/components/auth/AuthParts";
+import { AuthField, AuthMessage, AuthTitle } from "@/components/auth/AuthParts";
+import { authButton } from "@/components/auth/authButton";
 import { createClient } from "@/lib/supabase/client";
 
 function ResetForm() {

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { StrengthMeter } from "@/components/app/PasswordForm";
-import { AuthField, AuthMessage, AuthTitle, authButton } from "@/components/auth/AuthParts";
+import { AuthField, AuthMessage, AuthTitle } from "@/components/auth/AuthParts";
+import { authButton } from "@/components/auth/authButton";
 import { createClient } from "@/lib/supabase/client";
 
 export default function UpdatePasswordPage() {
